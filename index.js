@@ -12,11 +12,11 @@ server.use(express.json());   // DONT FORGET THIS !!!!!
 server.get(`${API}`, (req, res) => {
     // db.find() returns a promise that resolves to a list of existing hubs
     db.find().then(userInfo => { 
-        res.status(200).json(userInfo);    // introduce res.status() and res.json()
+        res.status(200).json(userInfo); 
       }) 
 
       .catch(err => {
-        res.status(500).json({      // use the catch-all 500 status code
+        res.status(500).json({ 
           success: false,
           err: "The user information could not be retrieved.",
         });
@@ -30,21 +30,21 @@ server.get(`${API}/:id`, (req, res) => {
             res.status(200).json ({
                 success: true,
                 userInfo
-            })
+            });
         } else {
             res.status(404).json({
                success: false,
                message: "The user with the specific ID does not exist"     
-            })
+            });
         }
 
     }).catch(err => {
         res.status(500).json({
             success: false,
-            err: "The user information could not be retreived"
-        })
-    })
-})
+            err: "The user information could not be retrieved"
+        });
+    });
+});
 
 
 
@@ -53,28 +53,28 @@ server.get(`${API}/:id`, (req, res) => {
 server.post(`${API}`, (req, res) => {
     const userInfo = req.body;
 
-    //  logic
+    //  check if name & bio provided 
     if(req.body.name && req.body.bio){
         db.insert(userInfo).then(info => {
             res.status(201).json({
                 success: true,
-                info
+                info,
             });
         }).catch(err => {
             res.status(500).json({success: false, err})
-        })
+        });
     } else {
         res.status(400).json({
             success: false,
             message: "Please provide name and bio for the user"
-        })
+        });
     }
-})
+});
 
 // DELETE
 server.delete(`${API}/:id`, (req, res) => {
   
-    const { id } = req.params; 
+    const { id } = req.params;   // deconstruct if possible
     
     db.remove(id).then(deleted => {
       if (deleted) {
@@ -84,14 +84,14 @@ server.delete(`${API}/:id`, (req, res) => {
           res.json({
              success: true,
              message: `we just got rid of user id ${id}`   
-          })  
+          });  
 
 
         } else {
          res.status(404).json({
              sucess: false,
              message: `The user with specfied id ${id} does not exist!!!! `   
-         })
+         });
       }
     }).catch(error => {
         res.status(500).json({
@@ -102,9 +102,13 @@ server.delete(`${API}/:id`, (req, res) => {
 
 // UPDATE
 server.put(`${API}/:id`, (req, res) => {
-    const {id} = req.params;
-    const changes = req.body;
-    //  logic
+     const {id} = req.params;
+    // const id = req.params;   // causes 404 Error - GOOD way to CHECK!!
+    
+     const changes = req.body;    
+   //  const {changes} = req.body;    // causes 500 Error - Good way to CHECK!! 
+
+    //  check if name & bio provided
     if(req.body.name && req.body.bio){
         db.update(id, changes).then(updated => {
             if (updated) {
@@ -112,14 +116,14 @@ server.put(`${API}/:id`, (req, res) => {
             } else {
                 res.status(404).json({
                     success: false,
-                    message: "I cannot find the hub you are looking for!!!!"
-                })
+                    message: "I cannot find the ID you are looking for!!!!"
+                });
             }
         }).catch(error => {
             res.status(404).json({
                 success: false, 
-                error: "the user information could not be modified"});
-
+                error: "the user information could not be modified"
+            });
         });
 
     } else {
@@ -129,10 +133,7 @@ server.put(`${API}/:id`, (req, res) => {
         });
     }
 
-
-
-
-})
+});
 
 
 
