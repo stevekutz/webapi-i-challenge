@@ -9,7 +9,7 @@ const server = express();
 server.use(express.json());   // DONT FORGET THIS !!!!!
 
 // GET
-server.get('/api/users', (req, res) => {
+server.get('/api/users/', (req, res) => {
     // db.find() returns a promise that resolves to a list of existing hubs
     db.find().then(userInfo => { 
         res.status(200).json(userInfo);    // introduce res.status() and res.json()
@@ -50,7 +50,7 @@ server.get("/api/users/:id", (req, res) => {
 
 
 //POST
-server.post("${API}", (req, res) => {
+server.post("/api/users", (req, res) => {
     const userInfo = req.body;
 
     //  logic
@@ -72,7 +72,7 @@ server.post("${API}", (req, res) => {
 })
 
 // DELETE
-server.delete("${API}/:id", (req, res) => {
+server.delete("/api/users/:id", (req, res) => {
   
     const { id } = req.params; 
     
@@ -80,8 +80,8 @@ server.delete("${API}/:id", (req, res) => {
       if (deleted) {
          // res.status(204).end(); 
          res.status(404).json({
-             sucess: false,
-             message: "The user with the specific ID does not exist"   
+             sucess: true,
+             message: `we just removed user with id ${id} !!!! `   
          })   
       
       
@@ -94,14 +94,14 @@ server.delete("${API}/:id", (req, res) => {
     }).catch(error => {
         res.status(500).json({
             success: false, 
-            error: "The user information could not be removed"})
+            error: "The user information could not be removed"});
     });
   });
 
 // UPDATE
-server.put('${API}/:id', (req, res) => {
+server.put('/api/users/:id', (req, res) => {
     const {id} = req.params;
-    
+    const changes = req.body;
     //  logic
     if(req.body.name && req.body.bio){
         db.update(id, changes).then(updated => {
