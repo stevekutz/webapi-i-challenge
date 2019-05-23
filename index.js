@@ -9,7 +9,7 @@ const server = express();
 server.use(express.json());   // DONT FORGET THIS !!!!!
 
 // GET
-server.get('/api/users/', (req, res) => {
+server.get(`${API}`, (req, res) => {
     // db.find() returns a promise that resolves to a list of existing hubs
     db.find().then(userInfo => { 
         res.status(200).json(userInfo);    // introduce res.status() and res.json()
@@ -24,12 +24,12 @@ server.get('/api/users/', (req, res) => {
   });
 
 // GET with specific ID
-server.get("/api/users/:id", (req, res) => {
+server.get(`${API}/:id`, (req, res) => {
     db.findById(req.params.id).then(userInfo => {
-        if(hub) {
+        if(userInfo) {
             res.status(200).json ({
                 success: true,
-                hub
+                userInfo
             })
         } else {
             res.status(404).json({
@@ -50,7 +50,7 @@ server.get("/api/users/:id", (req, res) => {
 
 
 //POST
-server.post("/api/users", (req, res) => {
+server.post(`${API}`, (req, res) => {
     const userInfo = req.body;
 
     //  logic
@@ -72,34 +72,36 @@ server.post("/api/users", (req, res) => {
 })
 
 // DELETE
-server.delete("/api/users/:id", (req, res) => {
+server.delete(`${API}/:id`, (req, res) => {
   
     const { id } = req.params; 
     
     db.remove(id).then(deleted => {
       if (deleted) {
-         // res.status(204).end(); 
-         res.status(404).json({
-             sucess: true,
-             message: `we just removed user with id ${id} !!!! `   
-         })   
-      
-      
+     //     res.status(204).end(); 
+     //     return;
+
+          res.json({
+             success: true,
+             message: `we just got rid of user id ${id}`   
+          })  
+
+
         } else {
-          res.status(500).json({
-              success: false,
-              message: "I cannot find the hub you are looking for",
-          })
+         res.status(404).json({
+             sucess: false,
+             message: `The user with specfied id ${id} does not exist!!!! `   
+         })
       }
     }).catch(error => {
         res.status(500).json({
             success: false, 
-            error: "The user information could not be removed"});
+            error: "The user could not be removed"});
     });
   });
 
 // UPDATE
-server.put('/api/users/:id', (req, res) => {
+server.put(`${API}/:id`, (req, res) => {
     const {id} = req.params;
     const changes = req.body;
     //  logic
@@ -116,7 +118,7 @@ server.put('/api/users/:id', (req, res) => {
         }).catch(error => {
             res.status(404).json({
                 success: false, 
-                error: "the user infomration could not be modified"});
+                error: "the user information could not be modified"});
 
         });
 
